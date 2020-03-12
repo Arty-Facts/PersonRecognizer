@@ -3,6 +3,7 @@ import skimage.io,  skimage.transform
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
 from Gabby.camara import get_image
+from time import time
 
 precision = 'fp32'
 ssd_model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd', model_math=precision)
@@ -11,11 +12,17 @@ classes_to_labels = utils.get_coco_object_dictionary()
 
 ssd_model.eval()
 while True:
+    start = time()
     inputs = [get_image(300,300)]
+    print(f"{time()-start}s to get image")
+    start = time()
     tensor = utils.prepare_tensor(inputs, precision == 'fp16')
+    print(f"{time()-start}s to process image")
     with torch.no_grad():
+        start = time()
         detections_batch = ssd_model(tensor)
-
+        print(f"{time()-start}s to predict")
+    start = time()
     results_per_input = utils.decode_results(detections_batch)
     best_results_per_input = [utils.pick_best(results, 0.50) for results in results_per_input]
 
@@ -42,4 +49,5 @@ while True:
                 print(int(bot*300), int(top*300), int(left*300),int(right*300))
                 im = image[max(0,int(bot*300)): max(0,int((bot+min(w, h))*300)), max(0,int(left*300)): max(0,int((left+min(w, h))*300))]
                 ax.imshow(im)
+    print(f"{time()-start}s gen image")
     plt.show()
