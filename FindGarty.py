@@ -2,7 +2,7 @@ import torch
 import skimage.io,  skimage.transform
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
-from Gabby.camara import get_image
+from Gabby.camera import get_image
 from time import time
 
 precision = 'fp32'
