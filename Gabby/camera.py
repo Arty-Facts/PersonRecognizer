@@ -28,3 +28,7 @@ for i in range(3):
     plt.imshow(output)
     plt.savefig(image_path)
     print(i)
+
+def get_image(h, b):
+
+    return #image np array
