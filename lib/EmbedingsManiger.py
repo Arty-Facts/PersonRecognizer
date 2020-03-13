@@ -42,7 +42,7 @@ class EmbedingsManiger():
             return True
 
     def remove(self,name):
-        with h5py.File(name, "a", libver='latest', swmr=True) as f:
+        with h5py.File(self.db, "a", libver='latest') as f:
             del f[name]
             self.info.remove(name)
         return True
@@ -60,9 +60,7 @@ class EmbedingsManiger():
         if name not in self.info:
             print("Not in db...")
             return False
-        data = data.numpy()
-        if len(data.shape) == 1:
-            data = data[np.newaxis, ... ]
+        data = np.array([d.numpy() for d in data])
         with h5py.File(self.db, "a", libver='latest', swmr=True) as f:
             dset = f[name]["emb"]
             dset.resize(dset.shape[0]+data.shape[0], axis=0) 
