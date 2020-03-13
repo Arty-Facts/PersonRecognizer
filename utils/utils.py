@@ -73,13 +73,14 @@ def get_image():
 
 
 def get_person(image, location, size):
-    x, y, w, h = location
+    x, y, w, h = list(map(lambda l: max(0, int(l*size)), location))
     window = min(w, h)
     if w > h:
-        im = image[max(0,int(y*size)): max(0,int((y+h)*size)), max(0,int(x*size)): max(0,int((x+w)*size))]
-        im = crop_center(im, int(window*size), int(window*size))
+        diff = (w - h)//2 
+        x_start = x+diff
+        im = image[y: y+h, x_start: x_start+h]
     else:
-        im = image[max(0,int(y*size)): max(0,int((y+window)*size)), max(0,int(x*size)): max(0,int((x+window)*size))]
+        im = image[y: y+window, x: x+window]
     return im
 
     
