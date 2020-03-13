@@ -14,6 +14,9 @@ try:
             camera.capture(frame, 'rgb')
         return frame
 except:
+    # cam = cv2.VideoCapture(0)
+    # cam.set(3, 1280)
+    # cam.set(4, 720)
     def nativ_image():
         cam = cv2.VideoCapture(0)
         cam.set(3, 1280)

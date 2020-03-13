@@ -2,3 +2,4 @@
 dog.jpg
 category_names.txt
 *.pyc
+db/*

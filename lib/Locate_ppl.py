@@ -8,6 +8,7 @@ import numpy as np
 import skimage.io,  skimage.transform
 import torchvision.transforms as transforms
 from utils.utils import *
+from PIL import Image
 
 class Locate_ppl():
     def __init__(self, threshold=0.5):
@@ -18,7 +19,7 @@ class Locate_ppl():
         self.threshold = threshold
         self.ssd_model.eval()
 
-    def test(self):
+    def snap(self):
         image, org_size = get_image()
         inputs = [prepare_input(image)]
         tensor = prepare_tensor(inputs)
@@ -45,6 +46,7 @@ class Locate_ppl():
                     location = [left, bot, abs(right - left), abs(top - bot)]
                     im = get_person(image,location, org_size)
                     # Show original, denormalized image...
+                    im = rescale(im, 256, 256)
                     ppl.append(im)
                     ax.imshow(im)
         plt.show
@@ -69,11 +71,7 @@ class Locate_ppl():
         return ppl
     
     def __iter__(self):
-        c = 0
         while True:
-            c+= 1
-            if c > 10:
-                break
             ppl=[]
             while len(ppl) == 0:
                 ppl = self.get_images()
