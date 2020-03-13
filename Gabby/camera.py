@@ -29,11 +29,11 @@ for i in range(3):
     plt.savefig(image_path)
     print(i)
 
-def get_image(b, h, c=3):
+def get_image():
     with PiCamera() as camera:
         camera.rotation = 180
-        camera.resolution = (b, h)
+        camera.resolution = (1920, 1080)
         camera.framerate = 15
-        output = np.empty((h,b,c), dtype=np.uint8)
+        output = np.empty((1080,1920,3), dtype=np.uint8)
         camera.capture(output, 'rgb')
     return output

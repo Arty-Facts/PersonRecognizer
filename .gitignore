@@ -1,3 +1,4 @@
 *.vscode/*
 dog.jpg
 category_names.txt
+*.pyc
