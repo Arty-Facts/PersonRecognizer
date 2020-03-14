@@ -11,16 +11,21 @@ from utils.utils import *
 from PIL import Image
 
 class Locate_ppl():
-    def __init__(self, threshold=0.5):
+    def __init__(self, threshold=0.5, from_disk=False, path=""):
         precision = 'fp32'
         self.ssd_model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd', model_math=precision)
         self.util = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd_processing_utils')
         self.classes_to_labels = self.util.get_coco_object_dictionary()
         self.threshold = threshold
         self.ssd_model.eval()
+        self.from_disk = from_disk
+        self.path = path
 
     def snap(self):
-        image, org_size = next(get_image())
+        if self.from_disk:
+            image, org_size = next(get_image_disc(self.path))
+        else:
+            image, org_size = next(get_image())
         inputs = [prepare_input(image)]
         tensor = prepare_tensor(inputs)
         with torch.no_grad():
@@ -51,24 +56,32 @@ class Locate_ppl():
                     ax.imshow(im)
         plt.show
         return ppl
+
+    def process(self, image, org_size):
+        inputs = [prepare_input(image)]
+        tensor = prepare_tensor(inputs)
+        with torch.no_grad():
+            predicted_batch = self.ssd_model(tensor)
+        results_per_input = self.util.decode_results(predicted_batch)
+        fillterd_ouput = [self.util.pick_best(results, self.threshold) for results in results_per_input]
+        ppl = []
+        for bboxes, classes, confidences in fillterd_ouput:
+            for idx in range(len(bboxes)):
+                if self.classes_to_labels[classes[idx] - 1] == "person":
+                    left, bot, right, top = bboxes[idx]
+                    fig, ax = plt.subplots(1)
+                    location = [left, bot, abs(right - left), abs(top - bot)]
+                    im = get_person(image,location, org_size)
+                    ppl.append(im)
+        return ppl
+
     def get_images(self):
-        for image, org_size in get_image():
-            inputs = [prepare_input(image)]
-            tensor = prepare_tensor(inputs)
-            with torch.no_grad():
-                predicted_batch = self.ssd_model(tensor)
-            results_per_input = self.util.decode_results(predicted_batch)
-            fillterd_ouput = [self.util.pick_best(results, self.threshold) for results in results_per_input]
-            ppl = []
-            for bboxes, classes, confidences in fillterd_ouput:
-                for idx in range(len(bboxes)):
-                    if self.classes_to_labels[classes[idx] - 1] == "person":
-                        left, bot, right, top = bboxes[idx]
-                        fig, ax = plt.subplots(1)
-                        location = [left, bot, abs(right - left), abs(top - bot)]
-                        im = get_person(image,location, org_size)
-                        ppl.append(im)
-            yield ppl
+        if self.from_disk:
+            for image, org_size in get_image_disc(self.path):
+                yield self.process(image, org_size)
+        else:
+            for image, org_size in get_image():
+                yield self.process(image, org_size)
     
     def __iter__(self):
         for ppl in self.get_images():

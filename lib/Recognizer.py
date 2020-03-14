@@ -22,7 +22,7 @@ class EMB_Dataset(Dataset):
 class Recognizer(nn.Module):
     def __init__(self,name, model_dir="models", load=True,  emb=512, out=2, batch_size=16, lr=1e-4):
         super(Recognizer, self).__init__()
-        _dir = Path("model_dir")
+        _dir = Path(model_dir)
         if not _dir.is_dir():
             _dir.mkdir()
         self.name = name

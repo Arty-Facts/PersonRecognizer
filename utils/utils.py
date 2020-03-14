@@ -28,9 +28,8 @@ except:
             yield frame
         cam.release()
 
-def nativ_image_disc():
-    Path("face_data")
-    faces = list(Path("face_data").iterdir())
+def nativ_image_disc(dir):
+    faces = list(Path(dir).iterdir())
     shuffle(faces)
     for p in faces:
         if p.is_file():
@@ -76,6 +75,15 @@ def prepare_input(img):
     img = crop_center(img, 300, 300)
     img = normalize(img)
     return img
+    
+def get_image_disc(path):
+    for frame in nativ_image_disc(path):
+        size = min(frame.shape[0], frame.shape[1])
+        top =  (frame.shape[1] - size)//2
+        left =  (frame.shape[0] - size)//2
+        frame = frame[left: left +size, top: top + size]
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        yield frame, size
 
 def get_image():
     for frame in nativ_image():
