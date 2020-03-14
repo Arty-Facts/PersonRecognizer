@@ -4,3 +4,4 @@ category_names.txt
 *.pyc
 db/*
 models/*
+face_data/*

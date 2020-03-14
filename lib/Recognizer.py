@@ -49,6 +49,11 @@ class Recognizer(nn.Module):
             ckpt = torch.load(f"{self.model_dir}/{self.name}.ckpt")
             self.model.load_state_dict(ckpt["model"])
             self.optimizer.load_state_dict(ckpt["optimizer"])
+        elif Path(f"{self.model_dir}/Otrher.ckpt").exists():
+            print(f"{self.model_dir}/{self.name}.ckpt not found ...")
+            print(f"Starting with pretrined models weights")
+            ckpt = torch.load(f"{self.model_dir}/Others.ckpt")
+            self.model.load_state_dict(ckpt["model"])
         else:
             print(f"{self.model_dir}/{self.name}.ckpt not found ...")
             print(f"Starting with random weights")
@@ -62,19 +67,24 @@ class Recognizer(nn.Module):
             print(f"No data for {self.name} in Embeding Maniger")
             return 
         loss_func = nn.CrossEntropyLoss()
+        ref_loss = float("inf")
         data = EMB_Dataset(emb_maniger, self.name)
         tot = len(data)
         data = DataLoader(data, shuffle=True, batch_size=self.bs)
-        tot_loss = 0
-        for x,y in data:
-            self.optimizer.zero_grad()
-
-            pred = self.model(x)
-            loss = loss_func(pred, y)
-            loss.backward()
-            self.optimizer.step()
-            tot_loss += loss.item()/self.bs
-        print(f"curret loss:{tot_loss/tot}")
+        while True:
+            tot_loss = 0
+            for x,y in data:
+                self.optimizer.zero_grad()
+                pred = self.model(x)
+                loss = loss_func(pred, y)
+                loss.backward()
+                self.optimizer.step()
+                tot_loss += loss.item()/self.bs
+            curr_loss = tot_loss/tot
+            if ref_loss < curr_loss:
+                break
+            ref_loss = curr_loss
+        print(f"curret loss:{curr_loss}")
 
 
 

@@ -79,9 +79,22 @@ class EmbedingsManiger():
                 with h5py.File(self.db, "r", libver='latest', swmr=True) as f:
                     image = np.asarray(f[name]["image"])
             plt.imshow(image)
+            plt.title(name)
             plt.show
         else:
             print("Not in db...")
+    def show_all(self):
+        for name in self.info:
+            if self.cache_ram:
+                image = np.asarray(self.cashed_db[name]["image"])
+            else:
+                with h5py.File(self.db, "r", libver='latest', swmr=True) as f:
+                    image = np.asarray(f[name]["image"])
+            fig, ax = plt.subplots(1)
+            ax.imshow(image)
+            ax.set_title(name)
+        plt.show
+
 
     def add(self, name, data):
         if name not in self.info:

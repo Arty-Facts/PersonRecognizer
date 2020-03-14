@@ -20,7 +20,7 @@ class Locate_ppl():
         self.ssd_model.eval()
 
     def snap(self):
-        image, org_size = get_image()
+        image, org_size = next(get_image())
         inputs = [prepare_input(image)]
         tensor = prepare_tensor(inputs)
         with torch.no_grad():
@@ -52,29 +52,26 @@ class Locate_ppl():
         plt.show
         return ppl
     def get_images(self):
-        image, org_size = get_image()
-        inputs = [prepare_input(image)]
-        tensor = prepare_tensor(inputs)
-        with torch.no_grad():
-            predicted_batch = self.ssd_model(tensor)
-        results_per_input = self.util.decode_results(predicted_batch)
-        fillterd_ouput = [self.util.pick_best(results, self.threshold) for results in results_per_input]
-        ppl = []
-        for bboxes, classes, confidences in fillterd_ouput:
-            for idx in range(len(bboxes)):
-                if self.classes_to_labels[classes[idx] - 1] == "person":
-                    left, bot, right, top = bboxes[idx]
-                    fig, ax = plt.subplots(1)
-                    location = [left, bot, abs(right - left), abs(top - bot)]
-                    im = get_person(image,location, org_size)
-                    ppl.append(im)
-        return ppl
+        for image, org_size in get_image():
+            inputs = [prepare_input(image)]
+            tensor = prepare_tensor(inputs)
+            with torch.no_grad():
+                predicted_batch = self.ssd_model(tensor)
+            results_per_input = self.util.decode_results(predicted_batch)
+            fillterd_ouput = [self.util.pick_best(results, self.threshold) for results in results_per_input]
+            ppl = []
+            for bboxes, classes, confidences in fillterd_ouput:
+                for idx in range(len(bboxes)):
+                    if self.classes_to_labels[classes[idx] - 1] == "person":
+                        left, bot, right, top = bboxes[idx]
+                        fig, ax = plt.subplots(1)
+                        location = [left, bot, abs(right - left), abs(top - bot)]
+                        im = get_person(image,location, org_size)
+                        ppl.append(im)
+            yield ppl
     
     def __iter__(self):
-        while True:
-            ppl=[]
-            while len(ppl) == 0:
-                ppl = self.get_images()
+        for ppl in self.get_images():
             yield ppl
 
 
