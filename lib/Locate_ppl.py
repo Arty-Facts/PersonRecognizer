@@ -20,6 +20,9 @@ class Locate_ppl():
         self.ssd_model.eval()
         self.from_disk = from_disk
         self.path = path
+        
+    def set_path(self, path):
+        self.path = path
 
     def snap(self):
         if self.from_disk:
