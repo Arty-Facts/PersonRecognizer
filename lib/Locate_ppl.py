@@ -11,7 +11,7 @@ from utils.utils import *
 from PIL import Image
 
 class Locate_ppl():
-    def __init__(self, threshold=0.5, from_disk=False, path="image_cache", save_img=False):
+    def __init__(self, threshold=0.5, from_disk=False, path="images", save_img=False):
         precision = 'fp32'
         self.ssd_model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd', model_math=precision)
         self.util = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd_processing_utils')
@@ -19,6 +19,7 @@ class Locate_ppl():
         self.threshold = threshold
         self.ssd_model.eval()
         self.from_disk = from_disk
+        self.set_path("images")
         self.set_path(path)
         self.save_img = save_img
         
