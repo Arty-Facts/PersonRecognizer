@@ -20,7 +20,7 @@ class EMB_Dataset(Dataset):
             return self.db.get(self.name, idx), torch.tensor(1, dtype=torch.long)
         return self.db.get_random(choice(self.others)), torch.tensor(0, dtype=torch.long)
 class Recognizer(nn.Module):
-    def __init__(self,name, model_dir="models", load=True,  emb=512, hidden=256, out=2, batch_size=16, lr=5e-4):
+    def __init__(self,name, model_dir="models", load=True,  emb=512, hidden=256, out=2, batch_size=16, lr=1e-4):
         super(Recognizer, self).__init__()
         _dir = Path(model_dir)
         if not _dir.is_dir():
@@ -28,12 +28,12 @@ class Recognizer(nn.Module):
         self.name = name
         self.model_dir = model_dir
         self.model = nn.Sequential(
-                        nn.Linear(emb, hidden),
-                        nn.ReLU(inplace=True),
-                        nn.Linear(hidden, out),
+                        nn.Linear(emb, out),
+                        # nn.ReLU(inplace=True),
+                        # nn.Linear(hidden, out),
                         nn.Softmax(dim=1),
                     )
-        self.optimizer = optim.SGD(self.model.parameters(), lr=lr)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
         self.bs = batch_size
         if load:
             self.load()
