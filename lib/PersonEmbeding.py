@@ -3,7 +3,7 @@ import torch.nn as nn
 from torchvision import transforms
 from PIL import Image
 class PersonEmbeding(nn.Module):
-    def __init__(self, nb_emb=16):
+    def __init__(self, nb_emb=4):
         super(PersonEmbeding, self).__init__()
         pt_model = torch.hub.load('pytorch/vision:v0.5.0', 'resnet34', pretrained=True)
         self.encoder = nn.Sequential(*list(pt_model.children())[:-1])
