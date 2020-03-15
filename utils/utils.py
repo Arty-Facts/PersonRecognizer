@@ -6,6 +6,8 @@ import matplotlib.image as mpimg
 from torchvision import transforms
 from pathlib import Path
 from random import shuffle
+from datetime import datetime
+from PIL import Image
 
 try:
     from picamera import PiCamera
@@ -106,4 +108,9 @@ def get_person(image, location, size):
         im = image[y: y+window, x: x+window]
     return im
 
-    
+def get_time():
+    now = datetime.now()
+    return now.strftime("%Y.%m.%d_%H.%M.%S.%f")
+
+def save_image(img, path):
+    mpimg.imsave(path, img)

@@ -31,7 +31,7 @@ class Recognizer(nn.Module):
                         nn.Linear(emb, out),
                         nn.Softmax(dim=1),
                     )
-        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
+        self.optimizer = optim.SGD(self.model.parameters(), lr=lr)
         self.bs = batch_size
         if load:
             self.load()
@@ -62,16 +62,20 @@ class Recognizer(nn.Module):
         with torch.no_grad():
             return self.model(inputs)
 
-    def get_beter(self, emb_maniger):
+    def get_beter(self, emb_maniger, it=1000):
         if self.name not in emb_maniger.info:
             print(f"No data for {self.name} in Embeding Maniger")
             return 
+        if it < self.bs:
+            print(f"batch size is {self.bs} can not process less the {self.bs}.\n incresse the numder of images or reduce the batch size")
         loss_func = nn.CrossEntropyLoss()
         ref_loss = float("inf")
         data = EMB_Dataset(emb_maniger, self.name)
         tot = len(data)
-        data = DataLoader(data, shuffle=True, batch_size=self.bs)
-        while True:
+        data = DataLoader(data, shuffle=True, batch_size=self.bs, drop_last=True)
+        c = 0
+        while c < it:
+            c+=self.bs
             tot_loss = 0
             for x,y in data:
                 self.optimizer.zero_grad()
@@ -81,10 +85,10 @@ class Recognizer(nn.Module):
                 self.optimizer.step()
                 tot_loss += loss.item()/self.bs
             curr_loss = tot_loss/tot
-            if ref_loss < curr_loss:
-                break
+            # if ref_loss < curr_loss:
+            #     break
             ref_loss = curr_loss
-        print(f"curret loss:{curr_loss}")
+        print(f"curret loss:{curr_loss} after {c} images")
 
 
 

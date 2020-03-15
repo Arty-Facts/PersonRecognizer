@@ -1,7 +1,7 @@
 import torch 
 from matplotlib import pyplot as plt
 import matplotlib.patches as patches
-#from Gabby.camera import get_image
+from pathlib import Path
 from time import time, sleep
 import cv2
 import numpy as np
@@ -11,7 +11,7 @@ from utils.utils import *
 from PIL import Image
 
 class Locate_ppl():
-    def __init__(self, threshold=0.5, from_disk=False, path=""):
+    def __init__(self, threshold=0.5, from_disk=False, path="image_cache", save_img=False):
         precision = 'fp32'
         self.ssd_model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd', model_math=precision)
         self.util = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd_processing_utils')
@@ -19,9 +19,13 @@ class Locate_ppl():
         self.threshold = threshold
         self.ssd_model.eval()
         self.from_disk = from_disk
-        self.path = path
+        self.set_path(path)
+        self.save_img = save_img
         
     def set_path(self, path):
+        _dir = Path(path)
+        if not _dir.is_dir():
+            _dir.mkdir()
         self.path = path
 
     def snap(self):
@@ -29,6 +33,8 @@ class Locate_ppl():
             image, org_size = next(get_image_disc(self.path))
         else:
             image, org_size = next(get_image())
+            if self.save_img: #not recomended on a embeded device
+                save_image(image, f"{self.path}/{get_time()}.jpg")
         inputs = [prepare_input(image)]
         tensor = prepare_tensor(inputs)
         with torch.no_grad():
@@ -72,7 +78,6 @@ class Locate_ppl():
             for idx in range(len(bboxes)):
                 if self.classes_to_labels[classes[idx] - 1] == "person":
                     left, bot, right, top = bboxes[idx]
-                    fig, ax = plt.subplots(1)
                     location = [left, bot, abs(right - left), abs(top - bot)]
                     im = get_person(image,location, org_size)
                     ppl.append(im)
@@ -84,6 +89,8 @@ class Locate_ppl():
                 yield self.process(image, org_size)
         else:
             for image, org_size in get_image():
+                if self.save_img: #not recomended on a embeded device
+                    save_image(image, f"{self.path}/{get_time()}.jpg")
                 yield self.process(image, org_size)
     
     def __iter__(self):

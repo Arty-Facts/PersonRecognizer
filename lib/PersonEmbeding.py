@@ -3,7 +3,7 @@ import torch.nn as nn
 from torchvision import transforms
 from PIL import Image
 class PersonEmbeding(nn.Module):
-    def __init__(self):
+    def __init__(self, nb_emb=16):
         super(PersonEmbeding, self).__init__()
         pt_model = torch.hub.load('pytorch/vision:v0.5.0', 'resnet34', pretrained=True)
         self.encoder = nn.Sequential(*list(pt_model.children())[:-1])
@@ -20,6 +20,7 @@ class PersonEmbeding(nn.Module):
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])
+        self.nb_emb = nb_emb
     def forward(self, inputs):
         with torch.no_grad():
             emb = self.encoder(inputs)
@@ -31,7 +32,7 @@ class PersonEmbeding(nn.Module):
             batch = []
             for img in images:
                 img = Image.fromarray(img)
-                for _ in range(16):
+                for _ in range(self.nb_emb):
                     batch.append(self.preprocess_trining(img))
             return self.forward(torch.stack(batch))
     
