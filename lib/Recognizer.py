@@ -20,7 +20,7 @@ class EMB_Dataset(Dataset):
             return self.db.get(self.name, idx), torch.tensor(1, dtype=torch.long)
         return self.db.get_random(choice(self.others)), torch.tensor(0, dtype=torch.long)
 class Recognizer(nn.Module):
-    def __init__(self,name, model_dir="models", load=True,  emb=512, hidden=256, out=2, batch_size=16, lr=1e-4):
+    def __init__(self,name, model_dir="models", load=True,  emb=512, hidden=256, out=2, batch_size=16, lr=1e-4, dropout=0.8):
         super(Recognizer, self).__init__()
         _dir = Path(model_dir)
         if not _dir.is_dir():
@@ -28,15 +28,15 @@ class Recognizer(nn.Module):
         self.name = name
         self.model_dir = model_dir
         self.model = nn.Sequential(
+                        nn.Dropout(dropout),
                         nn.Linear(emb, out),
-                        # nn.ReLU(inplace=True),
-                        # nn.Linear(hidden, out),
                         nn.Softmax(dim=1),
                     )
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
         self.bs = batch_size
         if load:
             self.load()
+        self.eval()
     
     def save(self):
         torch.save({
@@ -65,6 +65,7 @@ class Recognizer(nn.Module):
             return self.model(inputs)
 
     def get_beter(self, emb_maniger, it=1000):
+        self.train()
         if self.name not in emb_maniger.info:
             print(f"No data for {self.name} in Embeding Maniger")
             return 
@@ -91,6 +92,7 @@ class Recognizer(nn.Module):
             #     break
             ref_loss = curr_loss
         print(f"curret loss:{curr_loss} after {c} images")
+        self.eval()
 
 
 

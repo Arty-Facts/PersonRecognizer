@@ -19,7 +19,7 @@ try:
             while True:
                 frame = np.empty((1080,1920,3), dtype=np.uint8)
                 camera.capture(frame, 'rgb')
-            yield frame
+                yield frame
 except:
     def nativ_image():
         cam = cv2.VideoCapture(0)
