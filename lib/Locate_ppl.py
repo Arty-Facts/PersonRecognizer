@@ -40,6 +40,7 @@ class Locate_ppl():
         tensor = prepare_tensor(inputs)
         with torch.no_grad():
             predicted_batch = self.ssd_model(tensor)
+        # to do: vid mörker kraashar systemet
         results_per_input = self.util.decode_results(predicted_batch)
         fillterd_ouput = [self.util.pick_best(results, self.threshold) for results in results_per_input]
         ppl = []
