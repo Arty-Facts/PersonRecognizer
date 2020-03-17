@@ -14,7 +14,7 @@ class PersonEmbeding(nn.Module):
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])
-        self.preprocess_trining = transforms.Compose([
+        self.preprocess_training = transforms.Compose([
             transforms.Resize(256),
             transforms.RandomCrop(224),
             transforms.ToTensor(),
@@ -28,13 +28,12 @@ class PersonEmbeding(nn.Module):
             return emb
 
     def gen_training_emb(self, images):
-        with torch.no_grad():
-            batch = []
-            for img in images:
-                img = Image.fromarray(img)
-                for _ in range(self.nb_emb):
-                    batch.append(self.preprocess_trining(img))
-            return self.forward(torch.stack(batch))
+        batch = []
+        for img in images:
+            img = Image.fromarray(img)
+            for _ in range(self.nb_emb):
+                batch.append(self.preprocess_training(img))
+        return self.forward(torch.stack(batch))
     
     def embed(self, images):
         batch = [self.preprocess(Image.fromarray(img)) for img in images]

@@ -5,14 +5,10 @@ from matplotlib import pyplot as plt
 from pathlib import Path
 import torch
 def main():
-    lp = Locate_ppl()
+    Locate_ppl = Locate_ppl()
     rec = Recognizer()
     pe = PersonEmbeding()
-    db = Path("db")
-    models = Path("models")
-    for obj in [db, models]:
-        if not obj.is_dir():
-            obj.mkdir()
+
     
 
 

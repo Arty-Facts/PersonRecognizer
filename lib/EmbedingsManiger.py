@@ -25,7 +25,7 @@ class EmbedingsManiger():
 
     def get_len(self, name):
         if name not in self.info:
-            print("Not in db...")
+            print("Not in data base...")
             return 0
         if self.cache_ram:
             return self.cashed_db[name]["emb"].shape[0]
