@@ -3,9 +3,9 @@ import torch.nn as nn
 from torchvision import transforms
 from PIL import Image
 class PersonEmbeding(nn.Module):
-    def __init__(self, nb_emb=4):
+    def __init__(self, nb_emb=4, back_bone='resnet34'):
         super(PersonEmbeding, self).__init__()
-        pt_model = torch.hub.load('pytorch/vision:v0.5.0', 'resnet34', pretrained=True)
+        pt_model = torch.hub.load('pytorch/vision:v0.5.0', back_bone, pretrained=True)
         self.encoder = nn.Sequential(*list(pt_model.children())[:-1])
         self.encoder.eval()
         self.preprocess = transforms.Compose([

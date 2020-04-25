@@ -11,11 +11,9 @@ from utils.utils import *
 from PIL import Image
 
 class Locate_ppl():
-    def __init__(self, threshold=0.5, from_disk=False, path="images", save_img=False):
-        precision = 'fp32'
-        self.ssd_model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd', model_math=precision)
-        self.util = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_ssd_processing_utils')
-        self.classes_to_labels = self.util.get_coco_object_dictionary()
+    def __init__(self, threshold=0.5, from_disk=False, path="images", save_img=False, back_bone="resnet50"):
+        self.ssd_model = ssd()
+        self.classes_to_labels = get_coco_object_dictionary()
         self.threshold = threshold
         self.ssd_model.eval()
         self.from_disk = from_disk
@@ -41,8 +39,8 @@ class Locate_ppl():
         with torch.no_grad():
             predicted_batch = self.ssd_model(tensor)
         # to do: vid mörker kraashar systemet
-        results_per_input = self.util.decode_results(predicted_batch)
-        fillterd_ouput = [self.util.pick_best(results, self.threshold) for results in results_per_input]
+        results_per_input = decode_results(predicted_batch)
+        fillterd_ouput = [pick_best(results, self.threshold) for results in results_per_input]
         ppl = []
         for bboxes, classes, confidences in fillterd_ouput:
             fig, ax = plt.subplots(1)
@@ -73,8 +71,8 @@ class Locate_ppl():
         tensor = prepare_tensor(inputs)
         with torch.no_grad():
             predicted_batch = self.ssd_model(tensor)
-        results_per_input = self.util.decode_results(predicted_batch)
-        fillterd_ouput = [self.util.pick_best(results, self.threshold) for results in results_per_input]
+        results_per_input = decode_results(predicted_batch)
+        fillterd_ouput = [pick_best(results, self.threshold) for results in results_per_input]
         ppl = []
         for bboxes, classes, confidences in fillterd_ouput:
             for idx in range(len(bboxes)):
