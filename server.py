@@ -37,8 +37,6 @@ while True:
             stream.truncate()
         # Write a length of zero to the stream to signal we're done
         connection.write(struct.pack('<L', 0))
-    except:
-        print("lost connection")
     finally:
         try:
             connection.close()
