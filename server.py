@@ -1,6 +1,7 @@
 import io
 import socket
 import struct
+import time
 import picamera
 from hidden import IP
 
