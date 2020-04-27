@@ -43,4 +43,4 @@ try:
     connection.write(struct.pack('<L', 0))
 finally:
     connection.close()
-    client_socket.close()
+    server_socket.close()

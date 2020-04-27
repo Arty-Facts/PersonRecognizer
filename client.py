@@ -2,7 +2,7 @@ import io
 import socket
 import struct
 from PIL import Image
-import matplotlib.pyplot as ply
+import matplotlib.pyplot as plt
 from hidden import IP
 
 client_socket = socket.socket()
@@ -29,16 +29,16 @@ try:
         image = Image.open(image_stream)
         
         if img is None:
-            img = pl.imshow(image)
+            img = plt.imshow(image)
         else:
             img.set_data(image)
 
-        ply.pause(0.01)
-        ply.draw()
+        plt.pause(0.01)
+        plt.draw()
 
         print('Image is %dx%d' % image.size)
         image.verify()
         print('Image is verified')
 finally:
     connection.close()
-    server_socket.close()
+    client_socket.close()
