@@ -38,6 +38,9 @@ while True:
             stream.truncate()
         # Write a length of zero to the stream to signal we're done
         connection.write(struct.pack('<L', 0))
+    except expression as e:
+        print(e)
+
     finally:
         try:
             connection.close()
