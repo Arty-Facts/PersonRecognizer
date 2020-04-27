@@ -4,14 +4,14 @@ import struct
 import time
 import picamera
 from hidden import IP
-server_socket = socket.socket()
-server_socket.bind((IP, 8000)) 
-server_socket.listen(0)
-
-# Accept a single connection and make a file-like object out of it
-connection = server_socket.accept()[0].makefile('wb')
 
 try:
+    server_socket = socket.socket()
+    server_socket.bind((IP, 8000)) 
+    server_socket.listen(0)
+
+    # Accept a single connection and make a file-like object out of it
+    connection = server_socket.accept()[0].makefile('wb')
     camera = picamera.PiCamera()
     camera.vflip = True
     camera.resolution = (500, 480)

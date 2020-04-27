@@ -5,13 +5,13 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from hidden import IP
 
-client_socket = socket.socket()
-
-client_socket.connect((IP, 8000)) 
-
-# Make a file-like object out of the connection
-connection = client_socket.makefile('rb')
 try:
+    client_socket = socket.socket()
+
+    client_socket.connect((IP, 8000)) 
+
+    # Make a file-like object out of the connection
+    connection = client_socket.makefile('rb')
     img = None
     while True:
         # Read the length of the image as a 32-bit unsigned int. If the
