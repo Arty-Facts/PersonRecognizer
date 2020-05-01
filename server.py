@@ -7,7 +7,7 @@ from hidden import IP
 
 try:
     server_socket = socket.socket()
-    server_socket.bind((IP, 8000)) 
+    server_socket.bind((IP, 3000)) 
     server_socket.listen(0)
 
     # Accept a single connection and make a file-like object out of it

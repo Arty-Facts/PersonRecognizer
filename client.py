@@ -8,7 +8,7 @@ from hidden import IP
 try:
     client_socket = socket.socket()
 
-    client_socket.connect((IP, 8000)) 
+    client_socket.connect((IP, 3000)) 
 
     # Make a file-like object out of the connection
     connection = client_socket.makefile('rb')
