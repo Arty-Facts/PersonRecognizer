@@ -15,7 +15,7 @@ try:
     print("socket accepted")
     camera = picamera.PiCamera()
     camera.vflip = True
-    camera.resolution = (1920, 1080)
+    camera.resolution = (1080, 1080)
     # Start a preview and let the camera warm up for 2 seconds
     camera.start_preview()
     time.sleep(2)
